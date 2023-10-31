@@ -23,7 +23,12 @@ class App extends Component {
     console.log("inputValue in App", value);
   };
 
-  
+    handleSubmit = (event) => {
+    event.preventDefault();
+   // Вызываем fetchPhotos только при отправке формы
+    this.fetchAndSetPhotos();
+  };
+
 
   // Функция для выполнения запроса и обновления фотографий
   async fetchAndSetPhotos() {
@@ -57,7 +62,8 @@ class App extends Component {
   render() {
     return (
       <div>
-<Searchbar onSubmit={this.handleInputChange} />
+        <Searchbar onSubmit={this.handleInputChange}
+                    onSearch={this.handleSubmit} />
 
         {this.state.error !== null && (
           <p className="error-bage">
