@@ -36,6 +36,27 @@ img {
   padding-bottom: 24px;
 }
 
+.apologyMessage {
+  background-color: #00bfff;
+  border: 3px solid #0099cc;
+  padding: 20px;
+  text-align: center;
+  font-size: 28px;
+  color: #fff;
+  margin-top: 20px;
+  border-radius: 8px;
+}
+
+.errorBage {
+  background-color: #ffcc00;
+  border: 3px solid #ff9900;
+  padding: 20px;
+  text-align: center;
+  font-size: 28px;
+  color: #fff;
+  margin-top: 20px;
+  border-radius: 8px;
+}
 /*
  * Стили компонента Searchbar
  */

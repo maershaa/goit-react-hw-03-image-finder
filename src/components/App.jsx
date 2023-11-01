@@ -78,6 +78,8 @@ class App extends Component {
   render() {
     // Деструктуризация для упрощения доступа к состояниям
     const { error, isLoading, photos, selectedPhoto } = this.state;
+    const noPhotos = photos && photos.length === 0;
+
     return (
       <>
         {/* Компонент поисковой строки с передачей обработчиков событий */}
@@ -95,6 +97,13 @@ class App extends Component {
 
         {/* Отображаем индикатор загрузки, если isLoading равно true */}
         {isLoading && <Loader />}
+
+        {/* Если переменная noPhotos имеет значение true, отображаем сообщение об извинении, что не найдено изображений по вашему запросу */}
+        {noPhotos && (
+          <p className="apologyMessage">
+            Sorry, no images were found for your search.
+          </p>
+        )}
 
         {/* Отображаем галерею изображений, если фотографии не равны null и их количество больше 0 */}
         {photos && photos.length > 0 && (
