@@ -1,40 +1,43 @@
 import React, { Component } from 'react';
-import Searchbar from './Searchbar/Searchbar';
-import ImageGallery from './ImageGallery/ImageGallery';
-import Loader from './Loader/Loader';
-import Button from './Button/Button';
+import Searchbar from './Searchbar/Searchbar'; // Импортируем компонент поисковой строки
+import ImageGallery from './ImageGallery/ImageGallery'; // Импортируем компонент галереи изображений
+import Loader from './Loader/Loader'; // Импортируем компонент индикатора загрузки
+import Button from './Button/Button'; // Импортируем компонент кнопки "Загрузить еще"
 
-import fetchPhotos from '../helpers/api'; // Импортируем функцию fetchPhotos
+import fetchPhotos from '../helpers/api'; // Импортируем функцию fetchPhotos для выполнения запросов к API
 
 class App extends Component {
   state = {
     photos: null, // Состояние для хранения фотографий
-    isLoading: false, // Состояние для отображения загрузки
-    error: null, // Состояние для хранения ошибки (если есть)
-    inputValue: '', // Состояние для поискового запроса
+    isLoading: false, // Состояние для отображения индикатора загрузки
+    error: null, // Состояние для хранения сообщения об ошибке (если есть)
+    inputValue: '', // Состояние для хранения поискового запроса
   };
 
-  // Обработчик изменения поискового запроса
+  // Обработчик изменения значения поискового запроса
   handleInputChange = value => {
     this.setState({ inputValue: value });
-    console.log('inputValue in App', value);
   };
 
   // Обработчик отправки формы поиска
   handleSubmit = event => {
-    event.preventDefault();
-    // Вызываем функцию для выполнения запроса и обновления фотографий
-    this.fetchAndSetPhotos(this.state.inputValue);
+    const inputValue = this.state.inputValue.trim();
+    if (inputValue === '') {
+      // Предотвращаем отправку пустого запроса
+      return;
+    }
+    this.fetchAndSetPhotos(inputValue);
   };
 
   // Функция для выполнения запроса и обновления фотографий
-  async fetchAndSetPhotos() {
+  async fetchAndSetPhotos(query) {
     try {
-      const searchQuery = this.state.inputValue;
       // Устанавливаем isLoading в true перед началом запроса
       this.setState({ isLoading: true });
 
-      const data = await fetchPhotos(searchQuery);
+      // Выполняем запрос к API с переданным поисковым запросом
+      const data = await fetchPhotos(query);
+
       // При успешном запросе обновляем состояние фотографий и сбрасываем ошибку
       this.setState({ photos: data.hits, error: null });
     } catch (error) {
@@ -47,32 +50,38 @@ class App extends Component {
   }
 
   // Метод жизненного цикла, вызывается при обновлении компонента
-  componentDidUpdate(_, prevState) {
-    if (prevState.inputValue !== this.state.inputValue) {
-      // При изменении inputValue вызываем функцию для выполнения запроса и обновления фотографий
-      this.fetchAndSetPhotos();
-    }
-  }
+  // componentDidUpdate(_, prevState) {
+  //   if (prevState.inputValue !== this.state.inputValue) {
+  //     // При изменении inputValue вызываем функцию для выполнения запроса и обновления фотографий
+  //     this.fetchAndSetPhotos(this.state.inputValue);
+  //   }
+  // }
 
   render() {
+    // Деструктуризация для упрощения доступа к состояниям
+    const { error, isLoading, photos } = this.state;
     return (
       <>
+        {/* Компонент поисковой строки с передачей обработчиков событий */}
         <Searchbar
-          onSubmit={this.handleInputChange}
+          onInputChange={this.handleInputChange}
           onSearch={this.handleSubmit}
         />
 
-        {this.state.error !== null && (
+        {/* Отображаем сообщение об ошибке, если ошибка не равна null */}
+        {error !== null && (
           <p className="errorBage">
-            Oops, some error occurred... Error message: {this.state.error}
+            Oops, some error occurred... Error message: {error}
           </p>
         )}
 
-        {this.state.isLoading && <Loader />}
+        {/* Отображаем индикатор загрузки, если isLoading равно true */}
+        {isLoading && <Loader />}
 
-        {this.state.photos && this.state.photos.length > 0 && (
+        {/* Отображаем галерею изображений, если фотографии не равны null и их количество больше 0 */}
+        {photos && photos.length > 0 && (
           <>
-            <ImageGallery photos={this.state.photos} />
+            <ImageGallery photos={photos} />
             <Button />
           </>
         )}
