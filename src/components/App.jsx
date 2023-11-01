@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import Searchbar from './Searchbar/Searchbar'; // Импортируем компонент поисковой строки
-import ImageGallery from './ImageGallery/ImageGallery'; // Импортируем компонент галереи изображений
-import Loader from './Loader/Loader'; // Импортируем компонент индикатора загрузки
-import Button from './Button/Button'; // Импортируем компонент кнопки "Загрузить еще"
+import Searchbar from './Searchbar/Searchbar';
+import ImageGallery from './ImageGallery/ImageGallery';
+import Loader from './Loader/Loader';
+import Button from './Button/Button';
+import Modal from './Modal/Modal';
 
-import fetchPhotos from '../helpers/api'; // Импортируем функцию fetchPhotos для выполнения запросов к API
+import fetchPhotos from '../helpers/api';
 
 class App extends Component {
   state = {
@@ -12,6 +13,8 @@ class App extends Component {
     isLoading: false, // Состояние для отображения индикатора загрузки
     error: null, // Состояние для хранения сообщения об ошибке (если есть)
     inputValue: '', // Состояние для хранения поискового запроса
+    currentPage: 1, //  состояние для текущей страницы
+    selectedPhoto: null, //  состояние для выбранного изображения
   };
 
   // Обработчик изменения значения поискового запроса
@@ -30,16 +33,20 @@ class App extends Component {
   };
 
   // Функция для выполнения запроса и обновления фотографий
-  async fetchAndSetPhotos(query) {
+  async fetchAndSetPhotos(query, page = 1) {
     try {
       // Устанавливаем isLoading в true перед началом запроса
       this.setState({ isLoading: true });
 
-      // Выполняем запрос к API с переданным поисковым запросом
-      const data = await fetchPhotos(query);
+      // Выполняем запрос к API с переданным поисковым запросом и номером страницы
+      const data = await fetchPhotos(query, page);
 
-      // При успешном запросе обновляем состояние фотографий и сбрасываем ошибку
-      this.setState({ photos: data.hits, error: null });
+      // При успешном запросе, добавляем новые фотографии к текущим
+      const currentPhotos = this.state.photos || []; // Существующие фотографии
+      const newPhotos = data.hits; // Новые фотографии
+      const updatedPhotos = [...currentPhotos, ...newPhotos]; // Объединяем их
+
+      this.setState({ photos: updatedPhotos, error: null });
     } catch (error) {
       // В случае ошибки сохраняем сообщение об ошибке и очищаем фотографии
       this.setState({ error: error.message, photos: null });
@@ -49,17 +56,28 @@ class App extends Component {
     }
   }
 
-  // Метод жизненного цикла, вызывается при обновлении компонента
-  // componentDidUpdate(_, prevState) {
-  //   if (prevState.inputValue !== this.state.inputValue) {
-  //     // При изменении inputValue вызываем функцию для выполнения запроса и обновления фотографий
-  //     this.fetchAndSetPhotos(this.state.inputValue);
-  //   }
-  // }
+  // Обработчик для кнопки "Загрузить еще"
+  loadMoreImages = () => {
+    const { inputValue, currentPage } = this.state;
+    const nextPage = currentPage + 1; // Увеличиваем текущую страницу на 1
+    this.fetchAndSetPhotos(inputValue, nextPage); // Вызываем запрос для следующей страницы
+    this.setState({ currentPage: nextPage }); // Обновляем текущую страницу
+  };
+
+  // Обработчик клика на изображение в галерее
+  handleImageClick = photo => {
+    // При клике на изображение, обновляем состояние выбранного изображения
+    this.setState({ selectedPhoto: photo });
+  };
+
+  // Метод для закрытия модального окна
+  closeModal = () => {
+    this.setState({ selectedPhoto: null });
+  };
 
   render() {
     // Деструктуризация для упрощения доступа к состояниям
-    const { error, isLoading, photos } = this.state;
+    const { error, isLoading, photos, selectedPhoto } = this.state;
     return (
       <>
         {/* Компонент поисковой строки с передачей обработчиков событий */}
@@ -82,12 +100,18 @@ class App extends Component {
         {photos && photos.length > 0 && (
           <>
             <ImageGallery photos={photos} />
-            <Button />
+            <Button
+              photos={photos}
+              isLoading={isLoading}
+              onLoadMore={this.loadMoreImages}
+              onNoMoreResults={this.handleNoMoreResults}
+            />
           </>
         )}
 
-        {/* <Modal closeModal={this.closeModal}
-            modalData={this.state.modalData} /> */}
+        {selectedPhoto && ( // Если есть выбранное изображение, отображаем модальное окно
+          <Modal modalData={selectedPhoto} closeModal={this.closeModal} />
+        )}
       </>
     );
   }
