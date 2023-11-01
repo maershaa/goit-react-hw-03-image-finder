@@ -14,6 +14,7 @@ const fetchPhotos = async (searchQuery, page = 1, perPage = 12) => {
 
     const response = await axios.get(BASE_URL, { params });
     console.log('response in api', response);
+    console.log('searchQuery', searchQuery);
 
     return response.data;
   } catch (error) {

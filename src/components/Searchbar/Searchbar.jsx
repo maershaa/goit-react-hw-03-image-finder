@@ -1,25 +1,14 @@
-import React, { Component } from 'react'
-
+import React, { Component } from 'react';
 
 class Searchbar extends Component {
   state = {
     inputValue: '', // Инициализация состояния для значения ввода
   };
 
-  handleSubmit = (event) => {
-    event.preventDefault();
-    this.props.onSubmit(this.state.inputValue); // Вызовите пропс onSubmit из компонента App
-  };
-
-  handleInputChange = (event) => {
-    this.setState({ inputValue: event.target.value });
-        console.log('inputValue in SearchBar',event.target.value);
-  };
-
   render() {
     return (
       <header className="searchbar">
-        <form className="form" onSubmit={this.handleSubmit}>
+        <form className="searchForm" onSubmit={this.props.onSearch}>
           <button type="submit" className="button">
             <span className="buttonLabel">Поиск</span>
           </button>
@@ -30,7 +19,7 @@ class Searchbar extends Component {
             autoFocus
             placeholder="Искать изображения и фотографии"
             value={this.state.inputValue}
-            onChange={this.handleInputChange}
+            onChange={e => this.setState({ inputValue: e.target.value })}
           />
         </form>
       </header>

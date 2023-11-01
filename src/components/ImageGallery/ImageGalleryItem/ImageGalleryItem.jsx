@@ -1,8 +1,8 @@
 import React from 'react';
 
-const ImageGalleryItem = ({ photo }) => (
-  <li className="galleryItem">
-    <img src={photo.webformatURL} alt={photo.tags} />
+const ImageGalleryItem = ({ id, largeImageURL, webformatURL, tags }) => (
+  <li key={id} className="imageGalleryItem">
+    <img src={webformatURL} alt={tags} />
   </li>
 );
 
