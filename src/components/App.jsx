@@ -29,21 +29,30 @@ class App extends Component {
       // Предотвращаем отправку пустого запроса
       return;
     }
+    // Очистить список фотографий перед выполнением нового запроса
+    this.clearPhotos();
+
+    // Выполнить новый запрос
     this.fetchAndSetPhotos(inputValue);
   };
 
+  clearPhotos = () => {
+    this.setState({ photos: null });
+  };
+
   // Функция для выполнения запроса и обновления фотографий
-  async fetchAndSetPhotos(query, page = 1) {
+  async fetchAndSetPhotos(inputValue, currentPage = 1) {
     try {
       // Устанавливаем isLoading в true перед началом запроса
       this.setState({ isLoading: true });
 
       // Выполняем запрос к API с переданным поисковым запросом и номером страницы
-      const data = await fetchPhotos(query, page);
+      const data = await fetchPhotos(inputValue, currentPage);
 
       // При успешном запросе, добавляем новые фотографии к текущим
       const currentPhotos = this.state.photos || []; // Существующие фотографии
       const newPhotos = data.hits; // Новые фотографии
+
       const updatedPhotos = [...currentPhotos, ...newPhotos]; // Объединяем их
 
       this.setState({ photos: updatedPhotos, error: null });
@@ -72,6 +81,7 @@ class App extends Component {
 
   // Метод для закрытия модального окна
   closeModal = () => {
+    console.log('Closing modal');
     this.setState({ selectedPhoto: null });
   };
 
@@ -109,12 +119,15 @@ class App extends Component {
         {photos && photos.length > 0 && (
           <>
             <ImageGallery photos={photos} />
-            <Button
-              photos={photos}
-              isLoading={isLoading}
-              onLoadMore={this.loadMoreImages}
-              onNoMoreResults={this.handleNoMoreResults}
-            />
+
+            {/* Есть ли фотографии в массиве photos. Если есть, то это условие верно, и код внутри условия будет выполнен то есть отобразится кнопка Load more*/}
+            {photos && photos.length > 0 && (
+              <Button
+                photos={photos}
+                isLoading={isLoading}
+                onLoadMore={this.loadMoreImages}
+              />
+            )}
           </>
         )}
 
