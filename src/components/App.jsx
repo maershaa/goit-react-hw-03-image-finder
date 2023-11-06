@@ -65,6 +65,16 @@ class App extends Component {
     }
   }
 
+  componentDidUpdate(_, prevState) {
+    const { inputValue, currentPage } = this.state;
+    if (
+      prevState.inputValue !== this.state.inputValue ||
+      prevState.currentPage !== this.state.currentPage
+    ) {
+      this.fetchAndSetPhotos(inputValue, currentPage);
+    }
+  }
+
   // Обработчик для кнопки "Загрузить еще"
   loadMoreImages = () => {
     const { inputValue, currentPage } = this.state;
@@ -117,13 +127,10 @@ class App extends Component {
         {/* Отображаем галерею изображений, если фотографии не равны null и их количество больше 0 */}
         {photos && photos.length > 0 && (
           <>
-            <ImageGallery
-              photos={photos}
-              onImageClick={this.handleImageClick}
-            />
+            <ImageGallery photos={photos} onClick={this.handleImageClick} />
 
-            {/* Есть ли фотографии в массиве photos. Если есть, то это условие верно, и код внутри условия будет выполнен то есть отобразится кнопка Load more*/}
-            {photos && photos.length > 0 && (
+            {/* скрывает кнопку "Загрузить еще", если количество полученных изображений не делится на 12 (т.е. остаток от деления не равен нулю). */}
+            {photos && photos.length > 0 && photos.length % 12 === 0 && (
               <Button
                 photos={photos}
                 isLoading={isLoading}
