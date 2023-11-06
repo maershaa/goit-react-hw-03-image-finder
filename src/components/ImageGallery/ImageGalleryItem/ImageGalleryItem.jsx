@@ -2,18 +2,26 @@ import React, { Component } from 'react';
 
 export default class ImageGalleryItem extends Component {
   state = {
-    isModalOpen: false,
+    isOpenModal: false,
     modalData: {
       largeImg: '',
-      tag: '',
+      tagImg: '',
     },
   };
 
-  openModal = (largeImageURL, tags) => {
-    console.log('Opening modal');
+  openModal = data => {
     this.setState({
-      isModalOpen: true,
+      isOpenModal: true,
+      modalData: {
+        largeImg: data.largeImageURL,
+        tagImg: data.tags,
+      },
     });
+  };
+
+  handleImageClick = () => {
+    const { webformatURL, tags, largeImageURL } = this.props;
+    this.props.onClick({ webformatURL, tags, largeImageURL });
   };
 
   render() {
@@ -22,7 +30,7 @@ export default class ImageGalleryItem extends Component {
     return (
       <li
         className="imageGalleryItem"
-        onClick={() => this.openModal(largeImageURL, tags)}
+        onClick={() => this.openModal({ largeImageURL, tags })}
       >
         <img src={webformatURL} alt={tags} />
       </li>

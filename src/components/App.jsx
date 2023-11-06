@@ -74,9 +74,8 @@ class App extends Component {
   };
 
   // Обработчик клика на изображение в галерее
-  handleImageClick = photo => {
-    // При клике на изображение, обновляем состояние выбранного изображения
-    this.setState({ selectedPhoto: photo });
+  handleImageClick = selectedPhoto => {
+    this.setState({ selectedPhoto });
   };
 
   // Метод для закрытия модального окна
@@ -118,7 +117,10 @@ class App extends Component {
         {/* Отображаем галерею изображений, если фотографии не равны null и их количество больше 0 */}
         {photos && photos.length > 0 && (
           <>
-            <ImageGallery photos={photos} />
+            <ImageGallery
+              photos={photos}
+              onImageClick={this.handleImageClick}
+            />
 
             {/* Есть ли фотографии в массиве photos. Если есть, то это условие верно, и код внутри условия будет выполнен то есть отобразится кнопка Load more*/}
             {photos && photos.length > 0 && (
