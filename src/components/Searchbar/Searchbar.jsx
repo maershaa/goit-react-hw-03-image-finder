@@ -24,7 +24,24 @@ class Searchbar extends Component {
       <header className="searchbar">
         <form className="searchForm" onSubmit={this.handleSubmit}>
           <button type="submit" className="button">
-            <span className="buttonLabel">Поиск</span>
+            {/* мнемоника лупа */}
+            {/* <span> &#x1F50D; </span> */}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="feather feather-search"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <span className="buttonLabel"> Поиск</span>
           </button>
           <input
             className="input"

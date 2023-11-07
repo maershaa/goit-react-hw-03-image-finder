@@ -241,3 +241,7 @@ button:focus,
 .LoadMoreBtn:focus {
   background-color: #303f9f;
 }
+
+.button .feather-search {
+  margin-right: 8px;
+}
