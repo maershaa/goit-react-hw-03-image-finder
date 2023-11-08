@@ -9,12 +9,15 @@ class Searchbar extends Component {
   handleInputChange = event => {
     this.setState({ inputValue: event.target.value });
     // Вызываем функцию onInputChange из родительского компонента и передаем значение ввода
-    this.props.onInputChange(event.target.value);
   };
 
   // Обработчик отправки формы
   handleSubmit = event => {
     event.preventDefault();
+    const { inputValue } = this.state;
+    if (!inputValue) {
+      alert('Please, enter find name');
+    }
     // Вызываем функцию onSearch из родительского компонента для выполнения поиска
     this.props.onSearch(this.state.inputValue);
   };

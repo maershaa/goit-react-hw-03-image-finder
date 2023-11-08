@@ -18,33 +18,21 @@ class App extends Component {
   };
 
   // Обработчик изменения значения поискового запроса
-  handleInputChange = value => {
-    this.setState({ inputValue: value });
-  };
 
-  // Обработчик отправки формы поиска
-  handleSubmit = event => {
-    const inputValue = this.state.inputValue.trim();
-    if (inputValue === '') {
-      // Предотвращаем отправку пустого запроса
-      return;
-    }
-    // Очистить список фотографий перед выполнением нового запроса
-    this.clearPhotos();
-
-    // Выполнить новый запрос
-    this.fetchAndSetPhotos(inputValue);
+  handleSubmit = query => {
+    this.setState({ photos: [] });
+    this.setState({ inputValue: query, currentPage: 1 });
   };
 
   clearPhotos = () => {
-    this.setState({ photos: null });
+    this.setState({ photos: [] });
   };
 
   // Функция для выполнения запроса и обновления фотографий
   async fetchAndSetPhotos(inputValue, currentPage = 1) {
     try {
       // Устанавливаем isLoading в true перед началом запроса
-      this.setState({ isLoading: true });
+      this.setState({ isLoading: true, error: null });
 
       // Выполняем запрос к API с переданным поисковым запросом и номером страницы
       const data = await fetchPhotos(inputValue, currentPage);
@@ -72,15 +60,17 @@ class App extends Component {
       prevState.currentPage !== this.state.currentPage
     ) {
       this.fetchAndSetPhotos(inputValue, currentPage);
+      // Очистить список фотографий перед выполнением нового запроса
+      this.clearPhotos();
     }
   }
 
   // Обработчик для кнопки "Загрузить еще"
   loadMoreImages = () => {
-    const { inputValue, currentPage } = this.state;
-    const nextPage = currentPage + 1; // Увеличиваем текущую страницу на 1
-    this.fetchAndSetPhotos(inputValue, nextPage); // Вызываем запрос для следующей страницы
-    this.setState({ currentPage: nextPage }); // Обновляем текущую страницу
+    // Увеличиваем текущую страницу на 1
+    this.setState(prevState => ({
+      currentPage: prevState.currentPage + 1,
+    })); // Обновляем текущую страницу
   };
 
   // Обработчик клика на изображение в галерее
@@ -102,10 +92,7 @@ class App extends Component {
     return (
       <>
         {/* Компонент поисковой строки с передачей обработчиков событий */}
-        <Searchbar
-          onInputChange={this.handleInputChange}
-          onSearch={this.handleSubmit}
-        />
+        <Searchbar onSearch={this.handleSubmit} />
 
         {/* Отображаем сообщение об ошибке, если ошибка не равна null */}
         {error !== null && (
@@ -118,7 +105,7 @@ class App extends Component {
         {isLoading && <Loader />}
 
         {/* Если переменная noPhotos имеет значение true, отображаем сообщение об извинении, что не найдено изображений по вашему запросу */}
-        {noPhotos && (
+        {noPhotos && !isLoading && (
           <p className="apologyMessage">
             Sorry, no images were found for your search.
           </p>
